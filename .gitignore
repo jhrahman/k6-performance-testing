@@ -1,0 +1,22 @@
+# k6 test result / report output
+*.summary.json
+results/
+k6-results/
+*.html
+!README.md
+
+# Custom k6 binaries (built locally via xk6, e.g. for the faker extension)
+k6.exe
+k6
+
+# Node (only relevant if npm/package.json gets added later)
+node_modules/
+
+# Environment / secrets
+.env
+.env.local
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
+.vscode/
