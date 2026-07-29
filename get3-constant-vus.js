@@ -21,7 +21,7 @@ const params = {
 export default function (){
     const response = http.get('https://peoplix-hr.vercel.app/', params)
     sleep(2)
-    console.log(response.request.url);
+    
 
     check(response,{
         'status validation':(response)=>response.status === 200
