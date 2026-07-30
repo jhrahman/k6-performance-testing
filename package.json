@@ -1,0 +1,19 @@
+{
+  "name": "performance-testing-with-k6",
+  "version": "1.0.0",
+  "description": "A collection of [k6](https://k6.io/) scripts exploring different flavors of API load and performance testing — GET/POST requests, dynamic payloads, faker-generated test data, and staged stress tests against a couple of public sandbox APIs ([restful-booker](https://restful-booker.herokuapp.com/), [gorest.co.in](https://gorest.co.in/), and Grafana's [QuickPizza](https://quickpizza.grafana.com/)).",
+  "main": "index.js",
+  "directories": {
+    "test": "scenarios"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/k6": "^2.0.1",
+    "typescript": "^7.0.2"
+  }
+}

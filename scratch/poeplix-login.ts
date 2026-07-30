@@ -1,6 +1,6 @@
 import http from 'k6/http'
 import { check, sleep } from 'k6'
-import { URLS } from './config.js'
+import { URLS } from '../config.ts'
 
 export const options = {
     vus: 1,
@@ -25,9 +25,13 @@ const params ={
 }
 
 
+interface LoginResponseBody {
+    access_token: string
+}
+
 export default function(){
     const response = http.post(URLS.login, payload, params)
-    const body = response.json()
+    const body = response.json() as unknown as LoginResponseBody
     const accessToken = body.access_token
     
 

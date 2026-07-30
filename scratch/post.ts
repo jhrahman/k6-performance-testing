@@ -24,6 +24,6 @@ export default function () {
     // console.log('Response Body: ',response.body)
     check(response, {
         'status code validation':(response)=>response.status===201,
-        'Response ID validation':(response)=>response.body.includes('id')
+        'Response ID validation':(response)=>String(response.body).includes('id')
     })
 }

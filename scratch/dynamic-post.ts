@@ -1,6 +1,5 @@
 import http from 'k6/http'
 import { check } from 'k6'
-import { randomString } from 'https://jslib.k6.io/k6-utils/1.2.0/index.js'
 import faker from "k6/x/faker"
 
 
@@ -18,7 +17,6 @@ const params = {
 }
 
 const payload = {
-    // "firstname": randomString(7),
     "firstname": faker.person.email(),
     "lastname": faker.person.lastName(),
     "totalprice": 222,
@@ -39,6 +37,6 @@ export default function(){
 
     check(response, {
         'status code validation': (response)=>response.status === 200,
-        'response booking ID validation': (response)=>response.json('bookingid')
+        'response booking ID validation': (response)=>Boolean(response.json('bookingid'))
     })
 }

@@ -23,6 +23,6 @@ export default function () {
 
     check(response, {
         'status code validation': (response) => response.status === 200,
-        'Response ID validation': (response) => response.json('bookingid')
+        'Response ID validation': (response) => Boolean(response.json('bookingid'))
     })
 }

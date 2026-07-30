@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Usage: ./run-test.sh get.js
+# Usage: ./run-test.sh get.ts
 
 set -a            # auto-export every variable set from here on
 source .env.local # load our secrets (e.g. API_TOKEN) as env vars
