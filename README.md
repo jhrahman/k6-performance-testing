@@ -1,5 +1,10 @@
 # Peoplix HR — k6 Performance Testing
 
+![k6](https://img.shields.io/badge/k6-7D64FF?style=for-the-badge&logo=k6&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
+![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)
+![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)
+
 A performance testing suite built with **k6** and **TypeScript**, designed against [peoplix-hr](https://peoplix-hr.vercel.app), a real in-progress HR management app (leave, attendance, overtime, employee records).
 
 The centerpiece is a full **end-to-end user journey** — login, view leave, apply for leave, edit it, delete it — run under concurrent virtual users with per-endpoint performance thresholds and typed request/response contracts. It also includes a `scratch/` folder of smaller scripts written while working through core k6 features against public sandbox APIs.
