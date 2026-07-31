@@ -1,6 +1,16 @@
 # Peoplix HR — k6 Performance Testing
 
-A k6 test suite (TypeScript) for [peoplix-hr](https://peoplix-hr.vercel.app), an HR management app (leave, attendance, overtime, employee records). Also includes a folder of standalone scripts written while learning k6 against public sandbox APIs.
+A performance testing suite built with **k6** and **TypeScript**, designed against [peoplix-hr](https://peoplix-hr.vercel.app), a real in-progress HR management app (leave, attendance, overtime, employee records).
+
+The centerpiece is a full **end-to-end user journey** — login, view leave, apply for leave, edit it, delete it — run under concurrent virtual users with per-endpoint performance thresholds and typed request/response contracts. It also includes a `scratch/` folder of smaller scripts written while working through core k6 features against public sandbox APIs.
+
+## Highlights
+
+- **Realistic multi-step journeys, not single-endpoint smoke tests** — `leave-journey.ts` chains five dependent API calls (auth → GET → POST → PATCH → DELETE) into one measured flow, carrying state (access token, leave ID) between steps the way a real user session would.
+- **Per-endpoint performance budgets** — every request is tagged and given its own `p(95)` latency threshold and error-rate threshold, so a run reports pass/fail against concrete SLAs, not just HTTP 200s.
+- **Resilient auth handling** — the shared `login()` helper surfaces failure explicitly (`status`, no silent `undefined` token), so a bad login fails the check and short-circuits the journey instead of throwing further downstream.
+- **Type-safe scripts** — request/response shapes are modeled with TypeScript interfaces (`LoginResponse`, `LoginUser`) and checked via `@types/k6`, catching a wrong field name at edit time instead of at runtime.
+- **Secrets kept out of the repo** — credentials load from a gitignored `.env.local` via `__ENV`, never hardcoded.
 
 ## Project layout
 
@@ -9,7 +19,7 @@ config.ts              Base URL + endpoint constants for peoplix-hr
 helpers/auth.ts         Shared login helper — logs in once, returns the access token
 scenarios/               The actual test suite against peoplix-hr
   leave-get.ts             Load test: GET /api/leave under constant virtual users
-  leave-journey.ts         A realistic user journey: log in, then view leave — grouped and reported as one flow
+  leave-journey.ts         A realistic user journey: log in, view leave, apply for leave, edit the pending leave, then delete it — grouped and reported as one flow
 api-endpoints/            API reference pulled from the peoplix-hr repo (documents every route these tests hit)
 scratch/                 One-off scripts from learning core k6 concepts — not part of the framework, kept for reference
 types/                   Type declarations for k6 extensions without official types (e.g. the faker module)
@@ -23,11 +33,11 @@ What the `scenarios/`/`helpers/` framework actually exercises, and where:
 |---|---|---|
 | **Scenarios & executors** | `options.scenarios` in both `scenarios/*.ts` | `constant-vus` — holds a fixed number of virtual users running the script on a loop for a set duration, rather than a one-shot run |
 | **Thresholds** | `options.thresholds` | Pass/fail budgets per request, e.g. `p(95)<2000` (95% of requests under 2s) and `rate<0.03` (error rate under 3%) |
-| **Tagged metrics** | `tags: { endpoint: 'login' \| 'leave' }` on request params | Scopes a threshold to one specific request type (`http_req_duration{endpoint:login}`) instead of the whole script's traffic |
+| **Tagged metrics** | `tags: { endpoint: 'login' \| 'leave_get' \| 'leave_post' \| 'leave_patch' \| 'leave_delete' }` on request params | Scopes a threshold to one specific request type (`http_req_duration{endpoint:login}`) instead of the whole script's traffic |
 | **Checks** | `check(response, {...})` | Assertions on a response (status code, expected body field) that report pass/fail without stopping the test |
-| **Groups** | `group('Employee Login', ...)` in `leave-journey.ts` | Bundles related requests into one named block, so the summary reports them as a step in a user journey rather than flat, unrelated requests |
+| **Groups** | `group('Employee Login', ...)`, `'Employee View Leave'`, `'Employee Apply for Leave'`, `'Employee Edit Pending Leave'`, `'Employee Delete Pending Leave'` in `leave-journey.ts` | Bundles related requests into one named block, so the summary reports them as a step in a user journey rather than flat, unrelated requests. The journey applies for a leave, edits it while pending, then deletes it — carrying the returned `leaveID` between groups |
 | **Environment variables & secrets** | `__ENV.EMPLOYEE_EMAIL` / `__ENV.EMPLOYEE_PASSWORD` in `helpers/auth.ts` | Credentials come from `.env.local` at run time, never hardcoded in the script |
-| **Reusable helpers** | `helpers/auth.ts` → `login()` | Shared login logic imported by both scenarios, instead of duplicating the auth request in every test file |
+| **Reusable helpers** | `helpers/auth.ts` → `login()` | Shared login logic imported by both scenarios, instead of duplicating the auth request in every test file. Returns a `status` field too, so callers can check it and bail out early (no token) instead of crashing on `undefined` |
 | **Think time** | `sleep(...)` between requests | Mimics a real user pausing between actions instead of hammering the API back-to-back |
 | **TypeScript** | all of the above | Scripts are type-checked (`@types/k6`), so a typo'd field or wrong argument shows up as an editor error, not a runtime surprise |
 
